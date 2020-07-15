@@ -9,6 +9,9 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.ListView
 import android.widget.TextView
+import com.google.gson.GsonBuilder
+import okhttp3.*
+import java.io.IOException
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -16,10 +19,32 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         val listView = findViewById<ListView>(R.id.main_listview)
 
-        listView.adapter = MyCustomAdapter(this) // custom adapter telling list what to render
+        listView.adapter = MainAdapter(this) // custom adapter telling list what to render
+        fetchJson()
     }
 
-    private class MyCustomAdapter(context: Context) : BaseAdapter() {
+    fun fetchJson() {
+        println("Attempting to Fetch JSON")
+        val url = "https://aggiefeed.ucdavis.edu/api/v1/activity/public?s=0?l=25"
+        val request = Request.Builder().url(url).build()
+        val client = OkHttpClient()
+        client.newCall(request).enqueue(object: Callback {
+            override fun onResponse(call: Call, response: Response) {
+                val body = response?.body?.string()
+                println(body)
+                val gson = GsonBuilder().create()
+                val aggieFeed = gson.fromJson(body, AggieFeed::class.java)
+            }
+            override fun onFailure(call: Call, e: IOException) {
+                println("Failed to execute request")
+            }
+        })
+    }
+    class AggieFeed(val infoBlock: List<Info>)
+
+    class Info(val _id: String, val title: String)
+
+    private class MainAdapter(context: Context) : BaseAdapter() {
         private val mContext: Context
         init {
             mContext = context
@@ -38,10 +63,9 @@ class MainActivity : AppCompatActivity() {
         override fun getView(position: Int, convertView: View?, viewGroup: ViewGroup?): View {
             val layoutInflater = LayoutInflater.from(mContext)
             val rowMain = layoutInflater.inflate(R.layout.row_main, viewGroup, false)
+            val positionTextView = rowMain.findViewById<TextView>(R.id.position_textView)
+            positionTextView.text = "Row number: $position"
             return rowMain
-//            val textView = TextView(mContext)
-////            textView.text = "Here is my row for my listview"
-////            return textView
         }
     }
 }
