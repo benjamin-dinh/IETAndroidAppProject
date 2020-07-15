@@ -26,6 +26,7 @@ class MainActivity : AppCompatActivity() {
     fun fetchJson() {
         println("Attempting to Fetch JSON")
         val url = "https://aggiefeed.ucdavis.edu/api/v1/activity/public?s=0?l=25"
+//        var url = "https://api.letsbuildthatapp.com/youtube/home_feed"
         val request = Request.Builder().url(url).build()
         val client = OkHttpClient()
         client.newCall(request).enqueue(object: Callback {
@@ -33,15 +34,13 @@ class MainActivity : AppCompatActivity() {
                 val body = response?.body?.string()
                 println(body)
                 val gson = GsonBuilder().create()
-                val aggieFeed = gson.fromJson(body, AggieFeed::class.java)
+                val aggieFeed = gson.fromJson(body, Array<Info>::class.java)
             }
             override fun onFailure(call: Call, e: IOException) {
                 println("Failed to execute request")
             }
         })
     }
-    class AggieFeed(val infoBlock: List<Info>)
-
     class Info(val _id: String, val title: String)
 
     private class MainAdapter(context: Context) : BaseAdapter() {
