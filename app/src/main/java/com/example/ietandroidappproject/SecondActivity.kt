@@ -14,13 +14,16 @@ class SecondActivity : AppCompatActivity() {
         var intent = intent
         val title = intent.getStringExtra("title")
         val displayName = intent.getStringExtra("displayName")
+        val objectType = intent.getStringExtra("objectType")
         val published = intent.getStringExtra("published")
 
         val titleView = findViewById<TextView>(R.id.title_textView)
         val displayView = findViewById<TextView>(R.id.display_textView)
+        val objectView = findViewById<TextView>(R.id.object_textView)
         val publishedView = findViewById<TextView>(R.id.published_textView)
         titleView.text = title
         displayView.text = displayName
+        objectView.text = objectType
         publishedView.text = published
 
         val button = findViewById<Button>(R.id.button)

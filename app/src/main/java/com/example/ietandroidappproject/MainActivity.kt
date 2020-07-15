@@ -13,6 +13,7 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
 import com.google.gson.GsonBuilder
+import com.google.gson.annotations.SerializedName
 import okhttp3.*
 import java.io.IOException
 
@@ -37,7 +38,6 @@ class MainActivity : AppCompatActivity() {
                 println(body)
                 val gson = GsonBuilder().create()
                 val aggieFeed = gson.fromJson(body, Array<Info>::class.java)
-
                 val listView = findViewById<ListView>(R.id.main_listview)
                 runOnUiThread {
                     listView.adapter = MainAdapter(this@MainActivity ,aggieFeed)
@@ -48,7 +48,7 @@ class MainActivity : AppCompatActivity() {
             }
         })
     }
-    class Info(val _id: String, val title: String, val actor: Actor, val published: String)
+    class Info(val _id: String, val title: String, val actor: Actor, @SerializedName("object") val objectTranslated: ObjectType, val published: String)
     class Actor(val displayName: String)
     class ObjectType(val objectType: String)
 
@@ -79,6 +79,7 @@ class MainActivity : AppCompatActivity() {
                 val intent = Intent(rowMain.context, SecondActivity::class.java)
                 intent.putExtra("title", aggieFeed[position].title)
                 intent.putExtra("displayName", aggieFeed[position].actor.displayName)
+                intent.putExtra("objectType", aggieFeed[position].objectTranslated.objectType)
                 intent.putExtra("published", aggieFeed[position].published)
                 rowMain.context.startActivity(intent)
             }
