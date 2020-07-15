@@ -1,6 +1,7 @@
 package com.example.ietandroidappproject
 
 import android.content.Context
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,7 +10,8 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.ListView
 import android.widget.TextView
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.startActivity
 import com.google.gson.GsonBuilder
 import okhttp3.*
 import java.io.IOException
@@ -20,8 +22,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-
 //        listView.adapter = MainAdapter(this) // custom adapter telling list what to render
         fetchJson()
     }
@@ -75,6 +75,13 @@ class MainActivity : AppCompatActivity() {
             val nameTextView = rowMain.findViewById<TextView>(R.id.name_textView)
             nameTextView.text = aggieFeed[position].title
             positionTextView.text = aggieFeed[position].actor.displayName
+            rowMain.setOnClickListener {
+                val intent = Intent(rowMain.context, SecondActivity::class.java)
+                intent.putExtra("title", aggieFeed[position].title)
+                intent.putExtra("displayName", aggieFeed[position].actor.displayName)
+                intent.putExtra("published", aggieFeed[position].published)
+                rowMain.context.startActivity(intent)
+            }
             return rowMain
         }
     }
