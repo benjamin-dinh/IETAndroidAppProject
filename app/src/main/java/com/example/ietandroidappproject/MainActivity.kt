@@ -24,7 +24,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 //        listView.adapter = MainAdapter(this) // custom adapter telling list what to render
-        fetchJson()
+        fetchJson() // fetch data from API
     }
 
     fun fetchJson() {
@@ -34,12 +34,12 @@ class MainActivity : AppCompatActivity() {
         val client = OkHttpClient()
         client.newCall(request).enqueue(object: Callback {
             override fun onResponse(call: Call, response: Response) {
-                val body = response?.body?.string()
+                val body = response?.body?.string() // get body of response
                 println(body)
-                val gson = GsonBuilder().create()
-                val aggieFeed = gson.fromJson(body, Array<Info>::class.java)
+                val gson = GsonBuilder().create() // create GSON object
+                val aggieFeed = gson.fromJson(body, Array<Info>::class.java) // store object data in array of information
                 val listView = findViewById<ListView>(R.id.main_listview)
-                runOnUiThread {
+                runOnUiThread { // render Main Activity with information from aggieFeed
                     listView.adapter = MainAdapter(this@MainActivity ,aggieFeed)
                 }
             }
@@ -48,10 +48,13 @@ class MainActivity : AppCompatActivity() {
             }
         })
     }
+
+    // information stored in aggieFeed array, extracted from JSON
     class Info(val _id: String, val title: String, val actor: Actor, @SerializedName("object") val objectTranslated: ObjectType, val published: String)
     class Actor(val displayName: String)
     class ObjectType(val objectType: String)
 
+    // render Main View
     private class MainAdapter(context: Context, val aggieFeed: Array<Info>) : BaseAdapter() {
         private val mContext: Context
         init {
@@ -71,10 +74,13 @@ class MainActivity : AppCompatActivity() {
         override fun getView(position: Int, convertView: View?, viewGroup: ViewGroup?): View {
             val layoutInflater = LayoutInflater.from(mContext)
             val rowMain = layoutInflater.inflate(R.layout.row_main, viewGroup, false)
+            // get views by id
             val positionTextView = rowMain.findViewById<TextView>(R.id.position_textView)
             val nameTextView = rowMain.findViewById<TextView>(R.id.name_textView)
+            // fill in ListView information
             nameTextView.text = aggieFeed[position].title
             positionTextView.text = aggieFeed[position].actor.displayName
+            // transfer information to Second Activity when user clicks on a row in ListView
             rowMain.setOnClickListener {
                 val intent = Intent(rowMain.context, SecondActivity::class.java)
                 intent.putExtra("title", aggieFeed[position].title)
